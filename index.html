@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="css/public.css" />
+		<link rel="stylesheet" type="text/css" href="css/index.css" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+	</head>
+
+	<body>
+		<div class="box">
+			<div class="meng"></div>
+			<header>跑一下</header>
+			<div class="bag">
+				<nav>
+					<a href="#" class="active"><i class="iconfont icon-zhubaozhongbiao"></i>
+						<p>未接订单</p>
+					</a>
+					<a href="#"><i class="iconfont icon-shouyeyijiedingdan"></i>
+						<p>已接订单</p>
+					</a>
+					<a href="#"><i class="iconfont icon-wancheng3"></i>
+						<p>完成订单</p>
+					</a>
+				</nav>
+			</div>
+			<div class="content">
+				<ul class="cot_active">
+
+				</ul>
+				<ul class="content_normal">
+
+				</ul>
+				<ul class="content_normal">
+
+				</ul>
+			</div>
+		</div>
+	</body>
+
+</html>
+<script src="js/jquery.min.js"></script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		//		页面打开显示未接订单,获取未接订单数据
+		var token=localStorage.getItem("token");
+		var uid=localStorage.getItem("uid");
+		setTimeout(function(){
+			localStorage.removeItem("token");
+			localStorage.removeItem("uid");
+		},259200)
+		$.ajax({
+			url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/no_take",
+			type: "get",
+			dataType: "json",
+			async: false,
+			success: function(data) {
+				console.log(data)
+				for(var i = 0; i < data.data.length; i++) {
+					var time = data.data[i].update_time;
+					var type = data.data[i].type;
+					var name = data.data[i].username;
+					var phone = data.data[i].phone;
+					var address=data.data[i].arrival_address;
+					var orderNum = data.data[i].order_nums;
+					if(type == "快递") {
+						var serve_name = data.data[i].express_order
+					}
+//					else if(type == "买饭") {
+//						var serve_name = data.data[i].shop_name;
+//						var marks=data.data[i].marks;
+//					} 
+					else if(type == "买水果") {
+						var serve_name = data.data[i].fruit_name
+					} else if(type == "买菜") {
+						var serve_name = data.data[i].vegetables_name
+					} else {
+						var serve_name = data.data[i].mark
+					}
+					$(".content .cot_active").append("<li>" + "<p><span>接单时间：</span><span>" + time + "</span></p>" +
+						"<p><span type='" + type + "' class='types'>服务类别：</span><span>" + type + "</span></p>" +
+						"<p><span>服务要求：</span><span>" + serve_name +"</span></p>" +
+						"<p><span>姓名：</span><span>" + name + "</span></p>" +
+						"<p><span>联系电话：</span><span>" + phone + "</span></p>" +
+						"<p><span>送达地址：</span><span>" + address + "</span></p>" +
+						"<button tupe='button' class='btn5' orderNum='" + orderNum + "' id='deletes'>删除订单</button>" +
+						"<button type='button' class='btn btn1' orderNum='" + orderNum + "' id='orders'>接单</button>" +
+						"</li>")
+				}
+			}
+		});
+		//		点击删除订单
+		$('.content ul li .btn5').each(function() {
+			$(this).click(function() {
+				var btn_inx = $(this);
+				var orderNum = $(".btn5").attr("orderNum");
+				var type = $(".types").attr("type");
+				$.ajax({
+					url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/order_del",
+					type: "get",
+					dataType: "json",
+					async: false,
+					data: {
+						orderNum: orderNum,
+						type: type
+					},
+					success: function(data) {
+						console.log(data);
+						if(data.errorcode == 0) {
+							alert(data.message);
+						} else {
+							alert(data.message);
+						}
+						btn_inx.closest("li").remove();
+					}
+				});
+			})
+		});
+		//点击接单
+		$('.content ul li .btn1').each(function() {
+			$(this).click(function() {
+				var btn_inx = $(this);
+				var orderNum = $(".btn1").attr("orderNum");
+				var type = $(".types").attr("type");
+				$.ajax({
+					url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/member_order",
+					type: "get",
+					dataType: "json",
+					async: false,
+					data: {
+						orderNum: orderNum,
+						type: type
+					},
+					success: function(data) {
+						console.log(data);
+						if(data.errorcode == 0) {
+							alert(data.message);
+						} else {
+							alert(data.message);
+						}
+						btn_inx.closest("li").remove();
+					}
+				});
+			})
+		});
+		//nav切换 
+		$(".bag nav a").each(function() {
+			$(this).click(function() {
+				var inx = $(this).index();
+				$(this).addClass("active");
+				$(this).siblings('a').removeClass('active');
+				$(".content ul").each(function() {
+					$(this).removeClass("content_normal");
+					$(".content ul").eq(inx).siblings("ul").addClass("content_normal");
+					$(".content ul").eq(inx).siblings("ul").removeClass("cot_active");
+					$(".content ul").eq(inx).addClass("cot_active");
+					$(".content ul").eq(inx).empty();
+				})
+
+				//获取未接订单数据
+				if(inx == 0) {
+					$.ajax({
+						url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/no_take",
+						type: "get",
+						dataType: "json",
+						async: false,
+						success: function(data) {
+							for(var i = 0; i < data.data.length; i++) {
+								var time = data.data[i].update_time;
+								var type = data.data[i].type;
+								var name = data.data[i].username;
+								var phone = data.data[i].phone;
+								var address=data.data[i].arrival_address;
+								var orderNum = data.data[i].order_nums;
+								if(type == "快递") {
+									var serve_name = data.data[i].express_order
+								} 
+//								else if(type == "买饭") {
+//									var serve_name = data.data[i].shop_name;
+//									var marks=data.data[i].marks;
+//								}
+								else if(type == "买水果") {
+									var serve_name = data.data[i].fruit_name
+								} else if(type == "买菜") {
+									var serve_name = data.data[i].vegetables_name
+								} else {
+									var serve_name = data.data[i].mark
+								}
+								$(".content .cot_active").append("<li>" + "<p><span>接单时间：</span><span>" + time + "</span></p>" +
+									"<p><span type='" + type + "' class='types'>服务类别：</span><span>" + type + "</span></p>" +
+									"<p><span>服务要求：</span><span>" + serve_name  + "</span></p>" +
+									"<p><span>姓名：</span><span>" + name + "</span></p>" +
+									"<p><span>联系电话：</span><span>" + phone + "</span></p>" +
+									"<p><span>送达地址：</span><span>" + address + "</span></p>" +
+									"<button tupe='button' class='btn5'  orderNum='" + orderNum + "'>删除订单</button>" +
+									"<button type='button' class='btn btn1' orderNum='" + orderNum + "' id='orders'>接单</button>" +
+									"</li>")
+							}
+						}
+					});
+					//点击删除订单   
+					$('.content ul li .btn5').each(function() {
+						$(this).click(function() {
+							var btn_inx = $(this);
+							var orderNum = $(".btn5").attr("orderNum");
+							var type = $(".types").attr("type");
+							$.ajax({
+								url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/order_del",
+								type: "get",
+								dataType: "json",
+								async: false,
+								data: {
+									orderNum: orderNum,
+									type: type
+								},
+								success: function(data) {
+									console.log(data);
+									if(data.errorcode == 0) {
+										alert(data.message);
+									} else {
+										alert(data.message);
+									}
+									btn_inx.closest("li").remove();
+								}
+							});
+						})
+					});
+					//点击接单
+					$('.content ul li .btn1').each(function() {
+						$(this).click(function() {
+							var btn_inx = $(this);
+							var orderNum = $(".btn1").attr("orderNum");
+							var type = $(".types").attr("type");
+							$.ajax({
+								url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/member_order",
+								type: "get",
+								dataType: "json",
+								async: false,
+								data: {
+									orderNum: orderNum,
+									type: type
+								},
+								success: function(data) {
+									console.log(data);
+									if(data.errorcode == 0) {
+										alert(data.message);
+									} else {
+										alert(data.message);
+									}
+									btn_inx.closest("li").remove();
+								}
+
+							});
+						})
+					});
+				//获取已接订单数据
+				} else if(inx == 1) {
+					$.ajax({
+						url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/taking",
+						type: "get",
+						dataType: "json",
+						async: true,
+						success: function(data) {
+							console.log(data.data)
+							for(var i = 0; i < data.data.length; i++) {
+								var time = data.data[i].update_time;
+								var type = data.data[i].type;
+								if(type == "快递") {
+									var serve_name = data.data[i].express_order
+								} 
+//								else if(type == "买饭") {
+//									var serve_name = data.data[i].shop_name;
+//									var marks=data.data[i].marks;
+//								} 
+								else if(type == "买水果") {
+									var serve_name = data.data[i].fruit_name
+								} else if(type == "买菜") {
+									var serve_name = data.data[i].vegetables_name
+								} else {
+									var serve_name = data.data[i].mark
+								}
+								var name = data.data[i].username;
+								var phone = data.data[i].phone;
+								var end = data.data[i].arrival_address;
+								var orderNum = data.data[i].order_nums;
+
+								$(".content .cot_active").append("<li>" + "<p><span>接单时间：</span><span>" + time + "</span></p>" +
+									"<p><span type='" + type + "' class='types'>服务类别：</span><span>" + type + "</span></p>" +
+									"<p><span>姓名：</span><span>" + name + "</span></p>" +
+									"<button type='button' class='btn btn2'   orderNum='" + orderNum + "' id='orders'>已送达</button>" +
+									"<button type='button' class='btn4'>查看详情</button>" +
+									"<div class='shade'><p class='hide'><i class='iconfont icon-chahao1'></i></p><div class='shade_cot'><span>接单时间：<p>" + time + "</p></span><span>服务要求：<p>" + serve_name  +"</p></span><span>服务类别：<p>" + type + "</p></span><span>联系电话：<p>" + phone + "</p></span><span>姓名：<p>" + name + "</p></span><span>送达地址：<p>" + end + "</p></span></div></div>" +
+									"</li>")
+							};
+							$('.content ul li .btn2').each(function() {
+								$(this).click(function() {
+									var btn_inx = $(this);
+									var orderNum = $(".btn2").attr("orderNum");
+									var type = $(".types").attr("type");
+									$.ajax({
+										url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/arrival",
+										type: "get",
+										dataType: "json",
+										async: false,
+										data: {
+											orderNum: orderNum,
+											type: type
+										},
+										success: function(data) {
+											console.log(data);
+											if(data.errorcode == 0) {
+												alert(data.message);
+											} else {
+												alert(data.message);
+											}
+											btn_inx.closest("li").remove();
+										}
+
+									});
+								})
+							});
+							$('.content ul li .btn4').each(function() {
+								$(this).click(function() {
+									var btn_index = $(this).index();
+									$(this).siblings(".shade").show();
+									$(".meng").show()
+								})
+							});
+							$(".content ul li .shade .iconfont").each(function() {
+								$(this).click(function() {
+									$(".shade").hide();
+									$(".meng").hide()
+								})
+							});
+						}
+					});
+				//获取完成订单数据
+				} else {
+					$.ajax({
+						url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/is_take",
+						type: "get",
+						dataType: "json",
+						async: true,
+						success: function(data) {
+							for(var i = 0; i < data.data.length; i++) {
+								var time = data.data[i].update_time;
+								var type = data.data[i].type;
+								var name = data.data[i].username;
+								var phone = data.data[i].phone;
+								var end = data.data[i].arrival_address;
+								var orderNum = data.data[i].order_nums;
+								$(".content .cot_active").append("<li>" + "<p><span>接单时间：</span><span>" + time + "</span></p>" +
+									"<p><span type='" + type + "' class='types'>服务类别：</span><span>" + type + "</span></p>" +
+									"<p><span>姓名：</span><span>" + name + "</span></p>" +
+									"<button class='btn6' orderNum='"+orderNum+"'>删除订单</button>"+
+									"<button type='button' class='btn btn3' orderNum='"+orderNum+"'>查看详情</button>" +
+									"<div class='shade'><p class='hide'><i class='iconfont icon-chahao1'></i></p><div class='shade_cot'><span>送达时间：<p>" + time + "</p></span><span>服务类别：<p>" + type + "</p></span><span>联系电话：<p>" + phone + "</p></span><span>姓名：<p>" + name + "</p></span><span>送达地址：<p>" + end + "</p></span></div></div>" +
+									"</li>")
+							};
+							$('.content ul li .btn3').each(function() {
+								$(this).click(function() {
+									var btn_index = $(this).index();
+									$(this).siblings(".shade").show();
+									$(".meng").show()
+								})
+							});
+							$(".content ul li .shade .iconfont").each(function() {
+								$(this).click(function() {
+									$(".shade").hide();
+									$(".meng").hide()
+								})
+							});
+							//点击删除订单
+							$('.content ul li .btn6').each(function() {
+								$(this).click(function() {
+									var btn_inx = $(this);
+									var orderNum = $(".btn6").attr("orderNum");
+									var type = $(".types").attr("type");
+									$.ajax({
+										url: "https://paotui.gwwwgd.com/paotui/index.php/Admin/order_del",
+										type: "get",
+										dataType: "json",
+										async: false,
+										data: {
+											orderNum: orderNum,
+											type: type
+										},
+										success: function(data) {
+											console.log(data);
+											if(data.errorcode == 0) {
+												alert(data.message);
+											} else {
+												alert(data.message);
+											}
+											btn_inx.closest("li").remove();
+										}
+									});
+								})
+							});
+						}
+					});
+				}
+
+			})
+		})
+
+	})
+</script>

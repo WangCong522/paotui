@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8" />
+		<title>跑一跑登录</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+		<link rel="stylesheet" href="css/login.css" />
+		<link rel="stylesheet" type="text/css" href="css/public.css" />
+		<link rel="stylesheet" type="text/css" href="css/iconfont.css" />
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery.cookie.js"></script>
+	</head>
+
+	<body>
+		<div class="login_box">
+			<div class="user_logo"></div>
+			<div class="person">
+				<img src="img/logo.jpg" alt="" />
+				<!--<form action="" name="myform" onsubmit="return login()">-->
+				<div class="pass">
+					<input type="text" name="username" id="user" value="" placeholder="用户名/邮箱/手机" />
+					<i class="iconfont icon-xinxi"></i>
+				</div>
+				<div class="pass">
+					<input type="password" name="password" id="pass" placeholder="输入密码" />
+					<i class="iconfont icon-suo1"></i>
+				</div>
+				<p class="hint passtext"></p>
+				<input type="submit" value="提交" id="login" class="btn" />
+				<!--</form>-->
+			</div>
+		</div>
+
+		<script type="text/javascript">
+			$(function() {
+				var name = $("#user").val();
+				var pass = $("#pass").val();
+//				var token = getCookie("token");
+//				var uid = getCookie("uid");
+				var token=localStorage.getItem("token");
+				var uid=localStorage.getItem("uid")
+				console.log(token);
+				console.log(uid);
+				//				验证tooken
+				if(token != null || token != "") {
+					$.ajax({
+						url: 'https://paotui.gwwwgd.com/paotui/index.php/Admin/check_token',
+						type: "post",
+						dataType: "json",
+						data: {
+							token: token,
+							uid: uid
+						},
+						async: true,
+						success: function(data) {
+							if(data.errorcode == 0) {
+								window.location.assign("http://62.234.184.145/ptxg_/index.html")
+							}
+						}
+					})
+				}
+			});
+
+//			function getCookie(cookieName) {
+//				var cookieValue = "";
+//				if(document.cookie && document.cookie != '') {
+//					var cookies = document.cookie.split(';');
+//					for(var i = 0; i < cookies.length; i++) {
+//						var cookie = cookies[i];
+//						if(cookie.substring(0, cookieName.length + 2).trim() == cookieName.trim() + "=") {
+//							cookieValue = cookie.substring(cookieName.length + 2, cookie.length);
+//							break;
+//						}
+//					}
+//				}
+//				return cookieValue;
+//			}
+
+			//	表单提交
+			$('#login').click(function() {
+				var name = $("#user").val();
+				var pass = $("#pass").val();
+//				var name_cookie = $.cookie("userName", name, {
+//					expires: 7
+//				}); // 存储一个带7天期限的 cookie
+				if(name.length == 0) {
+					$(".hint").html("用户名不能为空");
+					return false;
+				} else {
+					$(".hint").html("");
+				}
+				if(pass.length == 0) {
+					$(".passtext").html("密码不能为空");
+					return false;
+				} else {
+					$(".passtext").html("");
+				}
+				$.ajax({
+					url: 'https://paotui.gwwwgd.com/paotui/index.php/Admin/admin_login',
+					type: "post",
+					dataType: "json",
+					data: {
+						username: name,
+						password: pass
+					},
+					async: false,
+					success: function(data) {
+						var token = data.data.token.token;
+						var uid = data.data.token.uid;
+//						$.cookie("token", token, {
+//							expires: 7
+//						});;
+//						$.cookie("uid", uid, {
+//							expires: 7
+//						});
+						var curTime = new Date().getTime();
+						localStorage.setItem("token",token);
+						localStorage.setItem("uid",uid);
+						
+						if(data.errorcode == 0) {
+							window.location.assign("http://62.234.184.145/ptxg_/index.html");
+							
+						} else {
+							$(".hint").html(data.message);
+						}
+					}
+				})
+				return true;
+			})
+		</script>
+	</body>
+
+</html>

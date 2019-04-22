@@ -1,0 +1,95 @@
+
+
+.login_box{
+	width:100%;
+	height:100%;
+	background:#f7f7f7; 
+	display:flex;
+	flex-direction: column;
+	position:relative;
+}
+.user_logo{
+	width:100%;
+	height:4.19rem !important;
+	background:url(../img/login_bg.png) no-repeat 100%;
+	background-size:cover;
+	background-position: center;
+	display:flex;
+	justify-content:center;
+	flex-shrink: 0;
+}
+.person{
+	width:2.95rem;
+	height:3.85rem;
+	background:#fff;
+	border-radius:.1rem;
+	position:absolute;
+	top:1.75rem;
+	left:50%;
+	transform: translateX(-50%);
+	-moz-transform: translateX(-50%);
+	-webkit-transform: translateX(-50%);
+	-ms-transform: translateX(-50%);
+	padding:.27rem;
+	box-sizing: border-box;
+	display:flex;
+	flex-direction: column;
+}
+.person .hint{
+	color:red;
+	font-size:.14em;
+	line-height:.25rem;
+	text-align:center;
+	margin-top:.15rem;
+}
+.person form{
+	width:100%;
+}
+.person img{
+	width:.6rem;
+	height:.6rem;
+	background:#f5bb19;
+	border-radius:.3rem;
+	margin: 0 auto .43rem;
+}
+.person .pass{
+	display:flex;
+	flex-direction: row;
+	position:relative;
+}
+.person .pass input{
+	width:100%;
+	height:.45rem;
+	font-size:.13rem;
+	border-bottom:1px solid #ededed;
+	padding:.1rem;
+	box-sizing: border-box;
+	outline: none;
+}
+.person .pass .iconfont{
+	position:absolute;
+	right:0;
+	top:0;
+	font-size:.18rem;
+	z-index:10;
+	color:#999;
+	line-height:.45rem;
+}
+.person .btn{
+	width:2.41rem;
+	height:.4rem;
+	background:#fa8a00;
+	border-radius:.2rem;
+	font-size:.14rem;
+	color:#fff;
+	border:none;
+	position:absolute;
+	bottom:.35rem;
+	left:50%;
+	outline: none;
+	transform: translateX(-50%);
+	-moz-transform: translateX(-50%);
+	-webkit-transform: translateX(-50%);
+	-ms-transform: translateX(-50%);
+}
+
